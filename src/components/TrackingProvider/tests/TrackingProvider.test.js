@@ -42,6 +42,17 @@ const PROP_DATA = {
             'pain': 'always'
         }
     },
+    eventSchema: {
+        'datepicker.close': {
+            'schema_name': 'test',
+        },
+        'datepicker.open': {
+            'schema_name': 'test',
+        },
+        'datepicker.perf': {
+            'version': 1
+        }
+    },
     fields: {
         'location': 'top',
         'action': 'test',
@@ -50,6 +61,10 @@ const PROP_DATA = {
     options: {
         'delay': '100',
         'jump': 'yolo'
+    },
+    schema: {
+        'schema_name': 'foo',
+        'version': 100
     }
 };
 
@@ -76,6 +91,12 @@ const CONTEXT_DATA = {
             'waitforever': 'sure'
         }
     },
+    eventSchema: {
+        'datepicker.close': {
+            'schema_name': 'another',
+            'version': 2
+        }
+    },
     fields: {
         'location': 'bottom',
         'action': 'failure',
@@ -84,14 +105,20 @@ const CONTEXT_DATA = {
     options: {
         'delay': '404',
         'up': 'down'
+    },
+    schema: {
+        'schema_name': 'test',
+        'version': 1
     }
 };
 
 const MERGED_DATA = {
     eventFields: {...CONTEXT_DATA.eventFields, ...PROP_DATA.eventFields},
     eventOptions: {...CONTEXT_DATA.eventOptions, ...PROP_DATA.eventOptions},
+    eventSchema: {...CONTEXT_DATA.eventSchema, ...PROP_DATA.eventSchema},
     fields: {...CONTEXT_DATA.fields, ...PROP_DATA.fields},
-    options: {...CONTEXT_DATA.options, ...PROP_DATA.options}
+    options: {...CONTEXT_DATA.options, ...PROP_DATA.options},
+    schema: {...CONTEXT_DATA.schema, ...PROP_DATA.schema}
 };
 
 Object.keys(MERGED_DATA.eventFields).forEach((key) => {
@@ -99,6 +126,9 @@ Object.keys(MERGED_DATA.eventFields).forEach((key) => {
 });
 Object.keys(MERGED_DATA.eventOptions).forEach((key) => {
     MERGED_DATA.eventOptions[key] = {...CONTEXT_DATA.eventOptions[key], ...PROP_DATA.eventOptions[key]};
+});
+Object.keys(MERGED_DATA.eventSchema).forEach((key) => {
+    MERGED_DATA.eventSchema[key] = {...CONTEXT_DATA.eventSchema[key], ...PROP_DATA.eventSchema[key]};
 });
 
 
@@ -116,8 +146,10 @@ describe('<TrackingProvider/>', () => {
                 _data: {
                     eventFields: undefined, // eslint-disable-line no-undefined
                     eventOptions: undefined, // eslint-disable-line no-undefined
+                    eventSchema: undefined, // eslint-disable-line no-undefined
                     fields: undefined, // eslint-disable-line no-undefined
                     options: undefined, // eslint-disable-line no-undefined
+                    schema: undefined, // eslint-disable-line no-undefined
                     trigger: provider.TrackingContext._data.trigger
                 },
                 hasProvider: true,
@@ -140,12 +172,20 @@ describe('<TrackingProvider/>', () => {
                         three: 'four'
                     }
                 },
+                eventSchema: {
+                    myEvent: {
+                        schema_name: 'myEvent_schema_name'
+                    }
+                },
                 fields: {
                     five: 'six',
                     seven: 'eight'
                 },
                 options: {
                     nine: 'ten'
+                },
+                schema: {
+                    schema_name: 'schema_name'
                 },
                 trigger: triggerStub
             };
@@ -172,12 +212,20 @@ describe('<TrackingProvider/>', () => {
                         three: 'three'
                     }
                 },
+                eventSchema: {
+                    myEvent: {
+                        five: 'five'
+                    }
+                },
                 fields: {
                     five: 'five',
                     seven: 'seven'
                 },
                 options: {
                     nine: 'nine'
+                },
+                schema: {
+                    version: 1
                 },
                 trigger: triggerStub
             };
@@ -203,9 +251,22 @@ describe('<TrackingProvider/>', () => {
                         four: 'four'
                     }
                 },
+                eventSchema: {
+                    myEvent: {
+                        five: 'five2',
+                        six: 'six'
+                    },
+                    secondEvent: {
+                        five: 'five',
+                        six: 'six'
+                    }
+                },
                 fields: {
                     five: 'six2',
                     eight: 'eight'
+                },
+                schema: {
+                    schema_name: 'test'
                 },
                 options: {
                     nine: 'nine',
@@ -219,8 +280,10 @@ describe('<TrackingProvider/>', () => {
             Object.assign(expectedData.eventFields.myEvent, _data2.eventFields.myEvent);
             expectedData.eventFields.secondEvent = _data2.eventFields.secondEvent;
             Object.assign(expectedData.eventOptions, _data2.eventOptions);
+            Object.assign(expectedData.eventSchema, _data2.eventSchema);
             Object.assign(expectedData.fields, _data2.fields);
             Object.assign(expectedData.options, _data2.options);
+            Object.assign(expectedData.schema, _data2.schema);
             // Should inherit the parent trigger method.
             expectedData.trigger = triggerStub;
 
@@ -313,13 +376,13 @@ describe('<TrackingProvider/>', () => {
         });
 
         it('should set this.TrackingContext._data to context data when no data passed', () => {
-            const trackingProvider = shallow(<TrackingProvider trigger={triggerSpy} eventFields={PROP_DATA.eventFields} eventOptions={PROP_DATA.eventOptions} fields={PROP_DATA.fields} options={PROP_DATA.options}/>).instance();
+            const trackingProvider = shallow(<TrackingProvider trigger={triggerSpy} eventFields={PROP_DATA.eventFields} eventOptions={PROP_DATA.eventOptions} eventSchema={PROP_DATA.eventSchema} fields={PROP_DATA.fields} options={PROP_DATA.options} schema={PROP_DATA.schema}/>).instance();
             trackingProvider.renderProvider();
             expect(trackingProvider.TrackingContext._data).to.deep.equal({...PROP_DATA, trigger: triggerSpy});
         });
 
         it('should set this.TrackingContext._data to merge of context data', () => {
-            const trackingProvider = shallow(<TrackingProvider trigger={triggerSpy} eventFields={PROP_DATA.eventFields} eventOptions={PROP_DATA.eventOptions} fields={PROP_DATA.fields} options={PROP_DATA.options}/>).instance();
+            const trackingProvider = shallow(<TrackingProvider trigger={triggerSpy} eventFields={PROP_DATA.eventFields} eventOptions={PROP_DATA.eventOptions} eventSchema={PROP_DATA.eventSchema} fields={PROP_DATA.fields} options={PROP_DATA.options} schema={PROP_DATA.schema}/>).instance();
             trackingProvider.renderProvider({_data: CONTEXT_DATA});
             expect(trackingProvider.TrackingContext._data).to.deep.equal({...MERGED_DATA, trigger: triggerSpy});
         });

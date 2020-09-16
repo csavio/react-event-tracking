@@ -63,16 +63,17 @@ function harness() {
             </dl>
             <h1>{'TrackingProvider and TrackingContext contextType'}</h1>
             <p>{'All these events have been setup to trigger on mount but can be manually triggered by clicking the related button.'}</p>
-            <h2>{'Provider with no fields or options.'}</h2>
+            <h2>{'Provider with no fields, schema or options.'}</h2>
             <TrackingChecker expected={{
                 event: 'generic.click',
                 fields: {},
-                options: {}}}
+                options: {},
+                schema: {}}}
             >
                 <EventButton label={'Generate generic.click'} />
             </TrackingChecker>
 
-            <h2>{'Provider with fields and no options.'}</h2>
+            <h2>{'Provider with fields and no schema or options.'}</h2>
             <TrackingChecker fields={{
                 'actionlocation': 'left',
                 'eventcategory': 'harness'
@@ -82,12 +83,13 @@ function harness() {
                     actionlocation: 'left',
                     eventcategory: 'harness'
                 },
-                options: {}}}
+                options: {},
+                schema: {}}}
             >
                 <EventButton label={'Generate generic.click'} />
             </TrackingChecker>
 
-            <h2>{'Nested Provider with fields and no options.'}</h2>
+            <h2>{'Nested Provider with fields and no schema or options.'}</h2>
             <TrackingProvider fields={{'actionlocation': 'top'}}>
                 <TrackingChecker
                     fields={{'eventcategory': 'harness'}}
@@ -97,13 +99,14 @@ function harness() {
                             actionlocation: 'top',
                             eventcategory: 'harness'
                         },
-                        options: {}}}
+                        options: {},
+                        schema: {}}}
                 >
                     <EventButton label={'Generate generic.click'} />
                 </TrackingChecker>
             </TrackingProvider>
 
-            <h2>{'Nested Provider with field overrides and no options.'}</h2>
+            <h2>{'Nested Provider with field overrides and no schema or options.'}</h2>
             <TrackingProvider fields={{
                 'actionlocation': 'left',
                 'eventcategory': 'junk'}}
@@ -118,13 +121,14 @@ function harness() {
                             actionlocation: 'top',
                             eventcategory: 'harness'
                         },
-                        options: {}}}
+                        options: {},
+                        schema: {}}}
                 >
                     <EventButton label={'Generate generic.click'}/>
                 </TrackingChecker>
             </TrackingProvider>
 
-            <h2>{'Provider with fields and eventFields with no options.'}</h2>
+            <h2>{'Provider with fields and eventFields with no schema or options.'}</h2>
             <TrackingChecker
                 fields={{
                     'actionlocation': 'left',
@@ -144,12 +148,37 @@ function harness() {
                         eventcategory: 'harness',
                         eventlabel: 'custom'
                     },
-                    options: {}}}
+                    options: {},
+                    schema: {}}}
             >
                 <EventButton label={'Generate generic.click'}/>
             </TrackingChecker>
 
-            <h2>{'Nested Provider with fields and eventFields with no options.'}</h2>
+            <h2>{'Provider with fields and schema'}</h2>
+            <TrackingChecker
+                fields={{
+                    'event_type': 'click',
+                    'event_category': 'generic',
+                }} schema={{
+                    'schema_name': 'UserInteraction',
+                    'schema_version': 1
+                }}
+                expected={{
+                    event: 'generic.click',
+                    fields: {
+                        event_type: 'click',
+                        event_category: 'generic'
+                    },
+                    options: {},
+                    schema: {
+                        schema_name: 'UserInteraction',
+                        schema_version: 1
+                    }}}
+            >
+                <EventButton label={'Generate generic.click'}/>
+            </TrackingChecker>
+
+            <h2>{'Nested Provider with fields and eventFields with no schema or options.'}</h2>
             <TrackingProvider
                 fields={{
                     'actionlocation': 'left',
@@ -184,13 +213,14 @@ function harness() {
                             eventlabel: 'custom',
                             highfrequency: 'false'
                         },
-                        options: {}}}
+                        options: {},
+                        schema: {}}}
                 >
                     <EventButton label={'Generate generic.click'}/>
                 </TrackingChecker>
             </TrackingProvider>
 
-            <h2>{'Nested Provider with fields, eventFields, options and eventOptions.'}</h2>
+            <h2>{'Nested Provider with fields, eventFields, options and eventOptions but no schema.'}</h2>
             <TrackingProvider fields={{
                 'actionlocation': 'left',
                 'eventcategory': 'harness',
@@ -241,13 +271,14 @@ function harness() {
                         options: {
                             delayProcessing: '100',
                             maxWaitTime: '300'
-                        }}}
+                        },
+                        schema: {}}}
                 >
                     <EventButton label={'Generate generic.click'}/>
                 </TrackingChecker>
             </TrackingProvider>
 
-            <h2>{'Provider with component consuming multiple contexts with one of them being contextType.'}</h2>
+            <h2>{'Provider with component consuming multiple contexts with one of them being contextType'}</h2>
             <TrackingChecker
                 fields={{
                     'actionlocation': 'left',
@@ -259,7 +290,8 @@ function harness() {
                         actionlocation: 'left',
                         eventcategory: 'harness'
                     },
-                    options: {}}}
+                    options: {},
+                    schema: {}}}
             >
                 <SecondContextChecker
                     value={SECONDCONTEXT}
@@ -276,7 +308,8 @@ function harness() {
                 expected={{
                     event: 'generic.click',
                     fields: {},
-                    options: {}}}
+                    options: {},
+                    schema: {}}}
             >
                 <TrackingTrigger event={'generic.click'}/>
                 <span>{'generic.click'}</span>
@@ -292,6 +325,35 @@ function harness() {
                     },
                     options: {
                         'delayProcessing': '200'
+                    },
+                    schema: {}}}
+            >
+                <TrackingTrigger event={'generic.click'}
+                    fields={{
+                        'actionlocation': 'top',
+                        'eventcategory': 'test'
+                    }}
+                    options={{
+                        'delayProcessing': '200'
+                    }}
+                />
+                <span>{'generic.click'}</span>
+            </TrackingChecker>
+
+            <h2>{'Trigger with fields, schema and options for TrackingTrigger.'}</h2>
+            <TrackingChecker
+                expected={{
+                    event: 'generic.click',
+                    fields: {
+                        'actionlocation': 'top',
+                        'eventcategory': 'test'
+                    },
+                    options: {
+                        'delayProcessing': '200'
+                    },
+                    schema: {
+                        'schema_name': 'UserInteraction',
+                        'schema_version': 1
                     }}}
             >
                 <TrackingTrigger event={'generic.click'}
@@ -301,6 +363,10 @@ function harness() {
                     }}
                     options={{
                         'delayProcessing': '200'
+                    }}
+                    schema={{
+                        'schema_name': 'UserInteraction',
+                        'schema_version': 1
                     }}
                 />
                 <span>{'generic.click'}</span>
@@ -343,7 +409,8 @@ function harness() {
                     options: {
                         'delayProcessing': '300',
                         'maxWaitTime': '500'
-                    }}}
+                    },
+                    schema: {}}}
             >
                 <TrackingTrigger event={'generic.click'}
                     fields={{

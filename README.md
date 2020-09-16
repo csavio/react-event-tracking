@@ -50,8 +50,10 @@ The `TrackingProvider` is a [React 16 context provider](https://reactjs.org/docs
 | ------------ | ------------------- | -------- | ----------- |
 | eventFields  | objectOf (objectOf) | ──       | An object of event specific fields where the event name is the key and the value is an object of field key/value pairs for the event. Event specific values will be merged with defaults from the `fields` property. |
 | eventOptions | objectOf (objectOf) | ──       | An object of event specific options where the event name is the key and the value is an object of option key/value pairs for the event. Event specific values will be merged with defaults from the `options` property. |
+| eventSchema  | objectOf (objectOf) | ──       | An object of event specific schema where the event name is the key and the value is an object of schema key/value pairs for the event. Event specific values will be merged with defaults from the `schema` property. |
 | fields       | objectOf (string)   | ──       | Object of string values that represents the default fields to apply to all events within this context. |
-| options      | objectOf (string)   | ──       | The trigger options. |
+| options      | objectOf (any)      | ──       | The trigger options. |
+| schema       | objectOf (any)      | ──       | The trigger schema. |
 | overwrite    | bool                | false    | When true, overwrites the current context with specified properties. Default is to merge instead of overwrite. |
 | trigger      | func                | () => {} | Tracking event trigger implementation. |
 
@@ -125,7 +127,8 @@ The `TrackingTrigger` component allows an application to declaratively trigger a
 | event        | string              | ──       | The event to trigger |
 | fields       | objectOf (string)   | {}       | The event specific fields |
 | onTrigger    | func                | () => {} | Callback function invoked after the event successfully triggered. |
-| options      | objectOf (string)   | {}       | The trigger options. |
+| options      | objectOf (any)      | {}       | The trigger options. |
+| schema       | objectOf (any)      | {}       | The trigger schema. |
 
 ```jsx
 import {TrackingTrigger} from '@vrbo/react-event-tracking';

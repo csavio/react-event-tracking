@@ -30,7 +30,9 @@ class TrackingTrigger extends PureComponent {
         /** Callback function invoked after the event successfully triggered. */
         onTrigger: PropTypes.func,
         /** Trigger options. */
-        options: PropTypes.objectOf(PropTypes.string)
+        options: PropTypes.objectOf(PropTypes.any),
+        /** Schema the event will adhere to */
+        schema: PropTypes.objectOf(PropTypes.any)
     };
 
     static defaultProps = {
@@ -40,9 +42,9 @@ class TrackingTrigger extends PureComponent {
     };
 
     componentDidMount() {
-        const {event, fields, onTrigger, options} = this.props;
+        const {event, fields, onTrigger, options, schema} = this.props;
         if (typeof this.trigger === 'function') {
-            const triggerContext = this.trigger(event, fields, options);
+            const triggerContext = this.trigger(event, fields, options, schema);
             onTrigger(triggerContext);
         }
     }
@@ -53,7 +55,7 @@ class TrackingTrigger extends PureComponent {
         // Save a reference to the trigger method for use in componentDidMount.
         this.trigger = trigger;
         return children;
-    }
+    };
 
     render() {
         return (

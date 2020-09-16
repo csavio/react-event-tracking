@@ -29,7 +29,9 @@ class EventButtonMultiple extends PureComponent {
         /** Button label. */
         label: PropTypes.string,
         /** The trigger options. */
-        options: PropTypes.objectOf(PropTypes.string)
+        options: PropTypes.objectOf(PropTypes.any),
+        /** Schema the event will adhere to */
+        schema: PropTypes.objectOf(PropTypes.any)
     };
 
     static defaultProps = {
@@ -37,7 +39,8 @@ class EventButtonMultiple extends PureComponent {
         expected: {},
         fields: {},
         label: 'Click Me',
-        options: {}
+        options: {},
+        schema: {}
     };
 
     state = {
@@ -53,11 +56,11 @@ class EventButtonMultiple extends PureComponent {
     }
 
     handleClick = () => {
-        const {event, fields, options} = this.props;
+        const {event, fields, options, schema} = this.props;
 
-        this.context.trigger(event, fields, options);
+        this.context.trigger(event, fields, options, schema);
         this.check(this.secondValue);
-    }
+    };
 
     render() {
         const {label} = this.props;

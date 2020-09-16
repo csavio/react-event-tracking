@@ -23,13 +23,17 @@ class TrackingChecker extends PureComponent {
         /** An object of event specific fields where the event name is the key and the value is an object of field key/value pairs for the event. Event specific values will be merged with defaults from the `fields` property. */
         eventFields: PropTypes.objectOf(PropTypes.objectOf(PropTypes.string)),
         /** An object of event specific options where the event name is the key and the value is an object of option key/value pairs for the event. Event specific values will be merged with defaults from the `options` property. */
-        eventOptions: PropTypes.objectOf(PropTypes.objectOf(PropTypes.string)),
+        eventOptions: PropTypes.objectOf(PropTypes.objectOf(PropTypes.any)),
+        /** An object of event specific schema where the event name is the key and the value is an object of option key/value pairs for the event. Event specific values will be merged with defaults from the `schema` property. */
+        eventSchema: PropTypes.objectOf(PropTypes.objectOf(PropTypes.any)),
         /** The expected data configuration. */
         expected: PropTypes.object,
         /** Object of string values that represents the default fields to apply to all events within this context. */
         fields: PropTypes.objectOf(PropTypes.string),
         /** The trigger options. */
-        options: PropTypes.objectOf(PropTypes.string),
+        options: PropTypes.objectOf(PropTypes.any),
+        /** Schema the event will adhere to */
+        schema: PropTypes.objectOf(PropTypes.any),
         /** When true, overwrites the current context with specified properties. Default is to merge instead of overwrite. */
         overwrite: PropTypes.bool,
     };
@@ -44,11 +48,11 @@ class TrackingChecker extends PureComponent {
         isValid: null
     };
 
-    trigger = (event, fields, options) => {
+    trigger = (event, fields, options, schema) => {
         const {expected} = this.props;
 
         if (expected) {
-            const actual = {event, fields, options};
+            const actual = {event, fields, options, schema};
             const expectedStr = JSON.stringify(expected);
             const actualStr = JSON.stringify(actual);
 
@@ -65,8 +69,8 @@ class TrackingChecker extends PureComponent {
             }
         }
 
-        console.log(`Triggered ${event} with fields: `, fields, ' and options: ', options);
-    }
+        console.log(`Triggered ${event} with fields: `, fields, ' schema: ', schema, ' and options: ', options);
+    };
 
     render() {
         const {children, expected, ...rest} = this.props; // eslint-disable-line no-unused-vars

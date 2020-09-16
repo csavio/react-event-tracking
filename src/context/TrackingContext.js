@@ -24,8 +24,10 @@ const context = {
     _data: { // Intended for private use only
         eventFields: {},
         eventOptions: {},
+        eventSchema: {},
         fields: {},
         options: {},
+        schema: {},
         // The original trigger implementation passed in to TrackingProvider
         trigger: null
     },

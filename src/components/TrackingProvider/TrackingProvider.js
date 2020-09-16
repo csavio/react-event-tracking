@@ -27,11 +27,15 @@ class TrackingProvider extends PureComponent {
         /** An object of event specific fields where the event name is the key and the value is an object of field key/value pairs for the event. Event specific values will be merged with defaults from the `fields` property. */
         eventFields: PropTypes.objectOf(PropTypes.objectOf(PropTypes.string)),
         /** An object of event specific options where the event name is the key and the value is an object of option key/value pairs for the event. Event specific values will be merged with defaults from the `options` property. */
-        eventOptions: PropTypes.objectOf(PropTypes.objectOf(PropTypes.string)),
+        eventOptions: PropTypes.objectOf(PropTypes.objectOf(PropTypes.any)),
+        /** An object of event specific schema where the event name is the key and the value is an object of option key/value pairs for the event. Event specific values will be merged with defaults from the `schema` property. */
+        eventSchema: PropTypes.objectOf(PropTypes.objectOf(PropTypes.any)),
         /** Object of string values that represents the default fields to apply to all events within this context. */
         fields: PropTypes.objectOf(PropTypes.string),
         /** The trigger options. */
-        options: PropTypes.objectOf(PropTypes.string),
+        options: PropTypes.objectOf(PropTypes.any),
+        /** Schema the event will adhere to */
+        schema: PropTypes.objectOf(PropTypes.any),
         /** When true, overwrites the current context with specified properties. Default is to merge instead of overwrite. */
         overwrite: PropTypes.bool,
         /** Tracking event trigger implementation. */
@@ -52,8 +56,10 @@ class TrackingProvider extends PureComponent {
             _data: {
                 eventFields: this.props.eventFields,
                 eventOptions: this.props.eventOptions,
+                eventSchema: this.props.eventSchema,
                 fields: this.props.fields,
                 options: this.props.options,
+                schema: this.props.schema,
                 trigger: this.props.trigger || (/* istanbul ignore next */() => {})
             },
             hasProvider: true,
@@ -66,23 +72,27 @@ class TrackingProvider extends PureComponent {
      *
      * @param {Object} data
      */
-    mergeContextData(data = {eventFields: {}, eventOptions: {}}) {
-        const {eventFields, eventOptions, fields, options, overwrite} = this.props;
+    mergeContextData(data = {eventFields: {}, eventOptions: {}, eventSchema: {}}) {
+        const {eventFields, eventOptions, eventSchema, fields, options, schema, overwrite} = this.props;
         const newData = {};
 
         if (overwrite) {
             newData.eventFields = eventFields || data.eventFields;
             newData.eventOptions = eventOptions || data.eventOptions;
+            newData.eventSchema = eventSchema || data.eventSchema;
             newData.fields = fields || data.fields;
             newData.options = options || data.options;
+            newData.schema = schema || data.schema;
         } else {
             // Not an overwrite so merge the properties and context objects
             newData.eventFields = {...data.eventFields, ...eventFields};
             newData.eventOptions = {...data.eventOptions, ...eventOptions};
+            newData.eventSchema = {...data.eventSchema, ...eventSchema};
             newData.fields = {...data.fields, ...fields};
             newData.options = {...data.options, ...options};
+            newData.schema = {...data.schema, ...schema};
 
-            // if eventFields or eventOptions was specified need to do a shallow
+            // if eventFields, eventSchema, or eventOptions was specified need to do a shallow
             // copy and another shallow copy one level deep for each key.
 
             if (eventFields) {
@@ -95,6 +105,11 @@ class TrackingProvider extends PureComponent {
                     newData.eventOptions[key] = {...data.eventOptions[key], ...eventOptions[key]};
                 });
             }
+            if (eventSchema) {
+                Object.keys(newData.eventSchema).forEach((key) => {
+                    newData.eventSchema[key] = {...data.eventSchema[key], ...eventSchema[key]};
+                });
+            }
         }
 
         return newData;
@@ -105,11 +120,12 @@ class TrackingProvider extends PureComponent {
      * values in context and then invokes the implementation specific trigger
      * method.
      */
-    trigger = (event, fields = {}, options = {}) => {
+    trigger = (event, fields = {}, options = {}, schema = {}) => {
         const data = this.TrackingContext._data;
         const name = event || data.event;
         const eventFields = data.eventFields ? data.eventFields[name] : {};
         const eventOptions = data.eventOptions ? data.eventOptions[name] : {};
+        const eventSchema = data.eventSchema ? data.eventSchema[name] : {};
 
         if (!name) {
             throw new TypeError('event is a required parameter');
@@ -125,8 +141,13 @@ class TrackingProvider extends PureComponent {
             ...eventOptions,
             ...options
         };
-        return data.trigger(name, fields, options);
-    }
+        schema = {
+            ...data.schema,
+            ...eventSchema,
+            ...schema
+        };
+        return data.trigger(name, fields, options, schema);
+    };
 
     /**
      * React Context render prop function. Merges the components properties with
@@ -145,7 +166,7 @@ class TrackingProvider extends PureComponent {
                 {children}
             </TrackingContext.Provider>
         );
-    }
+    };
 
     render() {
         return (

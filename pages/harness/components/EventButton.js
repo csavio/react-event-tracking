@@ -28,14 +28,17 @@ class EventButton extends PureComponent {
         /** Button label. */
         label: PropTypes.string,
         /** The trigger options. */
-        options: PropTypes.objectOf(PropTypes.string)
+        options: PropTypes.objectOf(PropTypes.any),
+        /** Schema the event will adhere to */
+        schema: PropTypes.objectOf(PropTypes.any)
     };
 
     static defaultProps = {
         event: 'generic.click',
         fields: {},
         label: 'Click Me',
-        options: {}
+        options: {},
+        schema: {}
     };
 
     componentDidMount() {
@@ -43,10 +46,10 @@ class EventButton extends PureComponent {
     }
 
     handleClick = () => {
-        const {event, fields, options} = this.props;
+        const {event, fields, options, schema} = this.props;
 
-        this.context.trigger(event, fields, options);
-    }
+        this.context.trigger(event, fields, options, schema);
+    };
 
     render() {
         const {label} = this.props;
